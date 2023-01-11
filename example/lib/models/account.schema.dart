@@ -160,6 +160,8 @@ class FullAccountViewQueryable extends KeyedViewQueryable<FullAccountView, int> 
       '  GROUP BY "invoices"."account_id"'
       ') "invoices"'
       'ON "accounts"."id" = "invoices"."account_id"'
+      'LEFT JOIN (${MemberCompanyViewQueryable().query}) "company"'
+      'ON "accounts"."company_id" = "company"."id"'
       'LEFT JOIN ('
       '  SELECT "accounts_parties"."account_id",'
       '    to_jsonb(array_agg("parties".*)) as data'
@@ -229,6 +231,8 @@ class UserAccountViewQueryable extends KeyedViewQueryable<UserAccountView, int> 
       '  GROUP BY "invoices"."account_id"'
       ') "invoices"'
       'ON "accounts"."id" = "invoices"."account_id"'
+      'LEFT JOIN (${MemberCompanyViewQueryable().query}) "company"'
+      'ON "accounts"."company_id" = "company"."id"'
       'LEFT JOIN ('
       '  SELECT "accounts_parties"."account_id",'
       '    to_jsonb(array_agg("parties".*)) as data'
@@ -304,25 +308,25 @@ class CompanyAccountViewQueryable extends KeyedViewQueryable<CompanyAccountView,
 
   @override
   CompanyAccountView decode(TypedMap map) => CompanyAccountView(
-      parties: map.getListOpt('parties', CompanyPartyViewQueryable().decoder) ?? const [],
       id: map.get('id', TextEncoder.i.decode),
       firstName: map.get('first_name', TextEncoder.i.decode),
       lastName: map.get('last_name', TextEncoder.i.decode),
-      location: map.get('location', LatLngConverter().decode));
+      location: map.get('location', LatLngConverter().decode),
+      parties: map.getListOpt('parties', CompanyPartyViewQueryable().decoder) ?? const []);
 }
 
 class CompanyAccountView {
   CompanyAccountView({
-    required this.parties,
     required this.id,
     required this.firstName,
     required this.lastName,
     required this.location,
+    required this.parties,
   });
 
-  final List<CompanyPartyView> parties;
   final int id;
   final String firstName;
   final String lastName;
   final LatLng location;
+  final List<CompanyPartyView> parties;
 }
