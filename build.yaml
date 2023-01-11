@@ -6,6 +6,7 @@ builders:
     auto_apply: dependents
     build_to: cache
     runs_before: ["stormberry|schema", "stormberry|runner"]
+    applies_builders: ["stormberry|schema", "stormberry|runner"]
   schema:
     import: "package:stormberry/builder.dart"
     builder_factories: [ "buildSchema" ]
